@@ -14,31 +14,34 @@ export function useTodayCompletions(user: User | null) {
     if (!user) return;
     const userId = user.id;
 
-    const scheduled = currentHabits.filter((h) => h.frequency.includes(todayShort));
+    try {
+      const scheduled = currentHabits.filter((h) => h.frequency.includes(todayShort));
 
-    if (scheduled.length > 0) {
-      await supabase.from("habit_completions").upsert(
-        scheduled.map((h) => ({
-          user_id: userId,
-          habit_id: h.id,
-          habit_name: h.name,
-          completed_on: todayDate,
-          completed: false,
-        })),
-        { onConflict: "habit_id,completed_on", ignoreDuplicates: true },
-      );
+      if (scheduled.length > 0) {
+        await supabase.from("habit_completions").upsert(
+          scheduled.map((h) => ({
+            user_id: userId,
+            habit_id: h.id,
+            habit_name: h.name,
+            completed_on: todayDate,
+            completed: false,
+          })),
+          { onConflict: "habit_id,completed_on", ignoreDuplicates: true },
+        );
+      }
+
+      const { data } = await supabase
+        .from("habit_completions")
+        .select("habit_id, completed")
+        .eq("user_id", userId)
+        .eq("completed_on", todayDate);
+
+      if (data) {
+        setCompletedIds(new Set(data.filter((c) => c.completed).map((c) => c.habit_id)));
+      }
+    } finally {
+      setCompletionsReady(true);
     }
-
-    const { data } = await supabase
-      .from("habit_completions")
-      .select("habit_id, completed")
-      .eq("user_id", userId)
-      .eq("completed_on", todayDate);
-
-    if (data) {
-      setCompletedIds(new Set(data.filter((c) => c.completed).map((c) => c.habit_id)));
-    }
-    setCompletionsReady(true);
   }, [user]);
 
   const toggleCompletion = async (habitId: string) => {

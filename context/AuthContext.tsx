@@ -47,8 +47,20 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
         const profile = await fetchProfile(session.user.id);
-        setUser(profile);
-        if (profile?.theme) setTheme(profile.theme);
+        if (profile) {
+          setUser(profile);
+          if (profile.theme) setTheme(profile.theme);
+        } else {
+          // DB unreachable but auth session is valid — use session data so the
+          // loading chain isn't permanently stuck.
+          setUser({
+            id: session.user.id,
+            email: session.user.email ?? "",
+            first_name: "",
+            last_name: "",
+            theme: "light",
+          });
+        }
       } else {
         setUser(null);
       }

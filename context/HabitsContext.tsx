@@ -4,13 +4,16 @@ import { createContext, ReactNode, useContext, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import { useHabitsData, type Habit } from "@/hooks/useHabitsData";
 import { useTodayCompletions } from "@/hooks/useTodayCompletions";
-import { useHistoryData, type Completion, type GroupedCompletions } from "@/hooks/useHistoryData";
+import {
+  useHistoryData,
+  type Completion,
+  type GroupedCompletions,
+} from "@/hooks/useHistoryData";
 
 // Re-export types so consumers keep the same import path
 export type { Habit, Completion, GroupedCompletions };
 
 // ─── Context type ─────────────────────────────────────────────────────────────
-
 interface HabitContextType {
   habits: Habit[] | null;
   todaysHabits: Habit[] | null;
@@ -18,8 +21,19 @@ interface HabitContextType {
   completionsReady: boolean;
   historyGrouped: GroupedCompletions | null;
   fetchHistory: (month: Date, habitId?: string) => void;
-  createHabit: (name: string, description: string, frequency: string[], emoji?: string) => void;
-  updateHabit: (id: string, name: string, description: string, frequency: string[], emoji?: string) => Promise<void>;
+  createHabit: (
+    name: string,
+    description: string,
+    frequency: string[],
+    emoji?: string,
+  ) => void;
+  updateHabit: (
+    id: string,
+    name: string,
+    description: string,
+    frequency: string[],
+    emoji?: string,
+  ) => Promise<void>;
   deleteHabit: (id: string) => Promise<void>;
   toggleCompletion: (habitId: string) => Promise<void>;
 }
@@ -32,13 +46,17 @@ export default function HabitProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
 
   const todayData = useTodayCompletions(user);
-  const habitsData = useHabitsData(user, todayData.syncAndFetchToday, todayData.handleHabitDeleted);
+  const habitsData = useHabitsData(
+    user,
+    todayData.syncAndFetchToday,
+    todayData.handleHabitDeleted,
+  );
   const historyData = useHistoryData(user);
 
   useEffect(() => {
     if (!user) return;
     habitsData.fetchHabits().then((fetched) => {
-      if (fetched) todayData.syncAndFetchToday(fetched);
+      todayData.syncAndFetchToday(fetched ?? []);
     });
   }, [user?.id]);
 

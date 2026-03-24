@@ -23,17 +23,16 @@ export async function proxy(request: NextRequest) {
   );
 
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  console.log(user);
+    data: { session },
+  } = await supabase.auth.getSession();
 
   const { pathname } = request.nextUrl;
 
-  if (protectedRoutes.some((r) => pathname.startsWith(r)) && !user) {
+  if (protectedRoutes.some((r) => pathname.startsWith(r)) && !session) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (publicRoutes.includes(pathname) && user) {
+  if (publicRoutes.includes(pathname) && session) {
     return NextResponse.redirect(new URL("/home", request.url));
   }
 
