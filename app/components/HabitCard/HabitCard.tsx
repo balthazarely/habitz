@@ -2,6 +2,7 @@
 
 import { Habit } from "@/context/HabitsContext";
 import { Button } from "@/components/ui/button";
+import { FaCheck } from "react-icons/fa6";
 
 interface Props {
   habit: Habit;
@@ -17,9 +18,14 @@ export default function HabitCard({ habit, done, onToggle }: Props) {
       }`}
     >
       <div className="flex items-center gap-3">
-        {habit.emoji && <span className="text-2xl leading-none">{habit.emoji}</span>}
+        {habit.emoji && (
+          <span className="text-2xl leading-none">{habit.emoji}</span>
+        )}
         <div className="flex flex-col gap-1">
-          <p className={`font-medium transition-colors ${done ? "line-through text-muted-foreground" : "text-foreground"}`}>
+          <p
+            aria-label="habit-name"
+            className={`font-medium transition-colors ${done ? "line-through text-muted-foreground" : "text-foreground"}`}
+          >
             {habit.name}
           </p>
           {habit.description && (
@@ -31,13 +37,10 @@ export default function HabitCard({ habit, done, onToggle }: Props) {
         variant={done ? "default" : "outline"}
         size="icon"
         onClick={onToggle}
+        aria-label="toggle-habit-btn"
         className="rounded-full shrink-0"
       >
-        {done && (
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
-        )}
+        {done && <FaCheck aria-label="completed" />}
       </Button>
     </div>
   );

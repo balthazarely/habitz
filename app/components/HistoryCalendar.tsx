@@ -1,6 +1,8 @@
 "use client";
 
+import { useMemo } from "react";
 import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
+import type { GroupedCompletions } from "@/context/HabitsContext";
 import type { DayButton } from "react-day-picker";
 
 type DayStatus = "full" | "partial" | "none";
@@ -8,7 +10,7 @@ type DayStatus = "full" | "partial" | "none";
 interface Props {
   month: Date;
   onMonthChange: (date: Date) => void;
-  dayStatuses: Record<string, DayStatus>;
+  grouped: GroupedCompletions | null;
 }
 
 function dateKey(date: Date) {
@@ -21,7 +23,18 @@ const dotColor: Record<DayStatus, string> = {
   none: "bg-red-400",
 };
 
-export default function HistoryCalendar({ month, onMonthChange, dayStatuses }: Props) {
+export default function HistoryCalendar({ month, onMonthChange, grouped }: Props) {
+  const dayStatuses = useMemo(() => {
+    if (!grouped) return {};
+    const result: Record<string, DayStatus> = {};
+    for (const [date, completions] of Object.entries(grouped)) {
+      const done = completions.filter((c) => c.completed).length;
+      const total = completions.length;
+      result[date] = done === total ? "full" : done === 0 ? "none" : "partial";
+    }
+    return result;
+  }, [grouped]);
+
   return (
     <Calendar
       mode="single"

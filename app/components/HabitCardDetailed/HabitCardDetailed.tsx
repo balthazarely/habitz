@@ -2,7 +2,7 @@
 
 import { Habit } from "@/context/HabitsContext";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { FaPencil, FaRegTrashCan } from "react-icons/fa6";
 
 interface Props {
   habit: Habit;
@@ -14,9 +14,15 @@ export default function HabitCardDetailed({ habit, onEdit, onDelete }: Props) {
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm p-4 flex items-start justify-between gap-3">
       <div className="flex items-start gap-3 min-w-0">
-        {habit.emoji && <span className="text-2xl leading-none shrink-0 mt-0.5">{habit.emoji}</span>}
+        {habit.emoji && (
+          <span className="text-2xl leading-none shrink-0 mt-0.5">
+            {habit.emoji}
+          </span>
+        )}
         <div className="flex flex-col gap-1 min-w-0">
-          <p className="font-medium text-zinc-900 dark:text-white">{habit.name}</p>
+          <p className="font-medium text-zinc-900 dark:text-white">
+            {habit.name}
+          </p>
           {habit.description && (
             <p className="text-sm text-zinc-500">{habit.description}</p>
           )}
@@ -40,7 +46,7 @@ export default function HabitCardDetailed({ habit, onEdit, onDelete }: Props) {
             onClick={onEdit}
             aria-label="Edit habit"
           >
-            <Pencil />
+            <FaPencil aria-label="edit-icon" />
           </Button>
           <Button
             variant="destructive"
@@ -48,7 +54,7 @@ export default function HabitCardDetailed({ habit, onEdit, onDelete }: Props) {
             onClick={onDelete}
             aria-label="Delete habit"
           >
-            <Trash2 />
+            <FaRegTrashCan aria-label="delete-icon" />
           </Button>
         </div>
       </div>

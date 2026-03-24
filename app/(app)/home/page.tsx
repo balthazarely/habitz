@@ -2,11 +2,14 @@
 
 import { useHabit, Habit } from "@/context/HabitsContext";
 import PageHeader from "@/app/components/PageHeader";
-import HabitCard from "@/app/components/HabitCard";
-import TodaySummaryCard from "@/app/components/TodaySummaryCard";
+import HabitCard from "@/app/components/HabitCard/HabitCard";
+import TodaySummaryCard from "@/app/components/TodaySummaryCard/TodaySummaryCard";
+import { HabitCardSkeleton } from "@/app/components/HabitCard/HabitCardSkeleton";
+import { TodaySummaryCardSkeleton } from "@/app/components/TodaySummaryCard/TodaySummaryCardSkeleton";
 
 export default function HomePage() {
-  const { todaysHabits, completedIds, toggleCompletion } = useHabit();
+  const { todaysHabits, completedIds, completionsReady, toggleCompletion } =
+    useHabit();
 
   const total = todaysHabits === null ? null : todaysHabits.length;
   const done =
@@ -17,10 +20,20 @@ export default function HomePage() {
   return (
     <main className="max-w-2xl w-full mx-auto px-4 pb-24 md:pb-8 flex flex-col gap-4">
       <PageHeader title="Today" />
-      <TodaySummaryCard total={total} done={done} />
+
+      {todaysHabits === null || !completionsReady ? (
+        <TodaySummaryCardSkeleton />
+      ) : (
+        <TodaySummaryCard total={total} done={done} />
+      )}
+
       <div className="flex flex-col gap-3">
-        {todaysHabits === null ? (
-          <p className="text-sm text-muted-foreground">Loading…</p>
+        {todaysHabits === null || !completionsReady ? (
+          <div className="flex flex-col gap-3">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <HabitCardSkeleton key={i} />
+            ))}
+          </div>
         ) : todaysHabits.length === 0 ? (
           <p className="text-sm text-muted-foreground">No habits yet.</p>
         ) : (

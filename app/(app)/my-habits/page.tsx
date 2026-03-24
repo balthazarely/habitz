@@ -2,21 +2,21 @@
 
 import { Habit, useHabit } from "@/context/HabitsContext";
 import HabitModal from "@/app/components/HabitModal";
-import HabitCardDetailed from "@/app/components/HabitCardDetailed";
+import HabitCardDetailed from "@/app/components/HabitCardDetailed/HabitCardDetailed";
 import PageHeader from "@/app/components/PageHeader";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import ConfirmationDialog from "@/app/components/ConfirmationDialog/ConfirmationDialog";
+import { HabitCardDetailedSkeleton } from "@/app/components/HabitCardDetailed/HabitCardDetailedSkeleton";
 
 export default function MyHabitsPage() {
   const { habits, deleteHabit } = useHabit();
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [deletingHabit, setDeletingHabit] = useState<Habit | null>(null);
+
+  const handleDeleteHabit = async () => {
+    await deleteHabit(deletingHabit!.id);
+    setDeletingHabit(null);
+  };
 
   return (
     <div className="max-w-2xl w-full mx-auto px-4 pb-24 md:pb-8 flex flex-col gap-8">
@@ -24,7 +24,11 @@ export default function MyHabitsPage() {
 
       <div className="flex flex-col gap-3">
         {habits === null ? (
-          <p className="text-sm text-zinc-400">Loading…</p>
+          <>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <HabitCardDetailedSkeleton key={i} />
+            ))}
+          </>
         ) : habits.length === 0 ? (
           <p className="text-sm text-zinc-400">
             No habits yet. Create one above.
@@ -47,36 +51,23 @@ export default function MyHabitsPage() {
           onClose={() => setEditingHabit(null)}
         />
       )}
-
-      <Dialog
-        open={!!deletingHabit}
-        onOpenChange={(open) => { if (!open) setDeletingHabit(null); }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete habit</DialogTitle>
-          </DialogHeader>
+      <ConfirmationDialog
+        isOpen={!!deletingHabit}
+        title="Delete habit"
+        text={
           <p className="text-sm text-muted-foreground">
             Are you sure you want to delete{" "}
-            <span className="font-medium text-foreground">{deletingHabit?.name}</span>
+            <span className="font-medium text-foreground">
+              {deletingHabit?.name}
+            </span>
             ? This cannot be undone.
           </p>
-          <div className="flex gap-3 justify-end">
-            <Button variant="ghost" onClick={() => setDeletingHabit(null)}>
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={async () => {
-                await deleteHabit(deletingHabit!.id);
-                setDeletingHabit(null);
-              }}
-            >
-              Delete
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+        }
+        cancelText="Cancel"
+        proceedText="  Delete"
+        cancelAction={() => setDeletingHabit(null)}
+        proceedAction={() => handleDeleteHabit()}
+      />
     </div>
   );
 }

@@ -6,7 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/context/AuthContext";
-import { CheckCircle, LogOut } from "lucide-react";
+import { FaCheck } from "react-icons/fa6";
+import { FaSignOutAlt } from "react-icons/fa";
+
 import { toast } from "sonner";
 
 export default function SettingsPage() {
@@ -36,7 +38,7 @@ export default function SettingsPage() {
     } finally {
       setSaving(false);
       toast("Profile has been updated!", {
-        icon: <CheckCircle className="w-4 h-4 text-green-500" />,
+        icon: <FaCheck className="w-4 h-4 text-green-500" />,
       });
     }
   };
@@ -46,7 +48,7 @@ export default function SettingsPage() {
     setTheme(next);
     await updateProfile(firstName, lastName, next);
     toast(`Theme has been changed to ${next}`, {
-      icon: <CheckCircle className="w-4 h-4 text-green-500" />,
+      icon: <FaCheck className="w-4 h-4 text-green-500" />,
     });
   };
 
@@ -124,7 +126,7 @@ export default function SettingsPage() {
             onClick={() => signOut()}
             className="w-full justify-start px-4 py-4 h-auto text-red-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-2xl"
           >
-            <LogOut className="w-4 h-4" />
+            <FaSignOutAlt className="w-4 h-4" />
             Sign out
           </Button>
         </div>

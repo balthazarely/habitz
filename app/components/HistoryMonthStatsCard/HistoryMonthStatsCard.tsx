@@ -1,20 +1,14 @@
-interface GroupedCompletions {
-  [date: string]: { completed: boolean }[];
-}
+import MonthStatsCardSkeleton from "./HistoryMonthStatsCardSkeleton";
+import type { GroupedCompletions } from "@/context/HabitsContext";
 
 interface Props {
   grouped: GroupedCompletions | null;
   monthLabel: string;
 }
 
-export default function MonthStatsCard({ grouped, monthLabel }: Props) {
+export default function HistoryMonthStatsCard({ grouped, monthLabel }: Props) {
   if (grouped === null) {
-    return (
-      <div className="rounded-2xl border bg-card px-5 py-4 flex flex-col gap-3 animate-pulse">
-        <div className="h-4 w-24 bg-muted rounded" />
-        <div className="h-8 w-16 bg-muted rounded" />
-      </div>
-    );
+    return <MonthStatsCardSkeleton />;
   }
 
   let totalDone = 0;
@@ -33,7 +27,8 @@ export default function MonthStatsCard({ grouped, monthLabel }: Props) {
     else partialDays++;
   }
 
-  const pct = totalScheduled === 0 ? 0 : Math.round((totalDone / totalScheduled) * 100);
+  const pct =
+    totalScheduled === 0 ? 0 : Math.round((totalDone / totalScheduled) * 100);
 
   return (
     <div className="rounded-2xl border bg-card px-5 py-4 flex flex-col gap-4">
@@ -59,19 +54,22 @@ export default function MonthStatsCard({ grouped, monthLabel }: Props) {
         <div className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-green-500 shrink-0" />
           <span className="text-xs text-muted-foreground">
-            <span className="font-semibold text-foreground">{perfectDays}</span> perfect
+            <span className="font-semibold text-foreground">{perfectDays}</span>{" "}
+            perfect
           </span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-yellow-400 shrink-0" />
           <span className="text-xs text-muted-foreground">
-            <span className="font-semibold text-foreground">{partialDays}</span> partial
+            <span className="font-semibold text-foreground">{partialDays}</span>{" "}
+            partial
           </span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-red-400 shrink-0" />
           <span className="text-xs text-muted-foreground">
-            <span className="font-semibold text-foreground">{missedDays}</span> missed
+            <span className="font-semibold text-foreground">{missedDays}</span>{" "}
+            missed
           </span>
         </div>
       </div>
