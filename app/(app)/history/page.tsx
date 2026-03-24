@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import PageHeader from "@/app/components/PageHeader";
-import HistoryCalendar from "@/app/components/HistoryCalendar";
+import PageHeader from "@/app/components/PageHeader/PageHeader";
+import HistoryCalendar from "@/app/components/HistoryCalendar/HistoryCalendar";
 import { useAuth } from "@/context/AuthContext";
 import { useHabit } from "@/context/HabitsContext";
-import { Button } from "@/components/ui/button";
 import HistoryMonthStatsCard from "@/app/components/HistoryMonthStatsCard/HistoryMonthStatsCard";
 import HistoryFilterPils from "@/app/components/HistoryFilterPils/HistoryFilterPils";
 import HistoryList from "@/app/components/HistoryList/HistoryList";
@@ -37,13 +36,11 @@ export default function HistoryPage() {
   return (
     <main className="max-w-2xl w-full mx-auto px-4 pb-24 md:pb-8 flex flex-col gap-8">
       <PageHeader title="History" />
-      {/* Habit filter pills */}
       <HistoryFilterPils
         habits={habits}
         selectedHabitId={selectedHabitId}
         setSelectedHabitId={setSelectedHabitId}
       />
-
       <HistoryMonthStatsCard grouped={historyGrouped} monthLabel={monthLabel} />
       <Accordion>
         <AccordionItem value="calendar" className="border-none">
@@ -61,7 +58,6 @@ export default function HistoryPage() {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-
       <HistoryList
         grouped={historyGrouped}
         selectedHabitId={selectedHabitId}

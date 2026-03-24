@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 export interface User {
@@ -38,6 +39,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
+  const { setTheme } = useTheme();
 
   useEffect(() => {
     const {
@@ -46,6 +48,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         const profile = await fetchProfile(session.user.id);
         setUser(profile);
+        if (profile?.theme) setTheme(profile.theme);
       } else {
         setUser(null);
       }

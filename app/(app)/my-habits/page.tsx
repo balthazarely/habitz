@@ -1,9 +1,9 @@
 "use client";
 
 import { Habit, useHabit } from "@/context/HabitsContext";
-import HabitModal from "@/app/components/HabitModal";
+import HabitModal from "@/app/components/HabitModal/HabitModal";
 import HabitCardDetailed from "@/app/components/HabitCardDetailed/HabitCardDetailed";
-import PageHeader from "@/app/components/PageHeader";
+import PageHeader from "@/app/components/PageHeader/PageHeader";
 import { useState } from "react";
 import ConfirmationDialog from "@/app/components/ConfirmationDialog/ConfirmationDialog";
 import { HabitCardDetailedSkeleton } from "@/app/components/HabitCardDetailed/HabitCardDetailedSkeleton";

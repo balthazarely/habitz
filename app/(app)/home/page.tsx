@@ -1,7 +1,7 @@
 "use client";
 
 import { useHabit, Habit } from "@/context/HabitsContext";
-import PageHeader from "@/app/components/PageHeader";
+import PageHeader from "@/app/components/PageHeader/PageHeader";
 import HabitCard from "@/app/components/HabitCard/HabitCard";
 import TodaySummaryCard from "@/app/components/TodaySummaryCard/TodaySummaryCard";
 import { HabitCardSkeleton } from "@/app/components/HabitCard/HabitCardSkeleton";

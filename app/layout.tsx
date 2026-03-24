@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "next-themes";
 import AuthProvider from "@/context/AuthContext";
 import HabitProvider from "@/context/HabitsContext";
 
@@ -30,9 +31,11 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <AuthProvider>
-          <HabitProvider>{children}</HabitProvider>
-        </AuthProvider>
+        <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
+          <AuthProvider>
+            <HabitProvider>{children}</HabitProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

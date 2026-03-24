@@ -1,6 +1,6 @@
 "use client";
 
-import SignUp from "./components/Login";
+import SignUp from "./components/Login/Login";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

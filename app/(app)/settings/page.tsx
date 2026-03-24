@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import PageHeader from "@/app/components/PageHeader";
+import { useTheme } from "next-themes";
+import PageHeader from "@/app/components/PageHeader/PageHeader";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -13,6 +14,7 @@ import { toast } from "sonner";
 
 export default function SettingsPage() {
   const { user, signOut, updateProfile } = useAuth();
+  const { setTheme: applyTheme } = useTheme();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [theme, setTheme] = useState("light");
@@ -46,6 +48,7 @@ export default function SettingsPage() {
   const handleThemeToggle = async (checked: boolean) => {
     const next = checked ? "dark" : "light";
     setTheme(next);
+    applyTheme(next);
     await updateProfile(firstName, lastName, next);
     toast(`Theme has been changed to ${next}`, {
       icon: <FaCheck className="w-4 h-4 text-green-500" />,

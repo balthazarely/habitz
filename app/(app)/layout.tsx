@@ -1,11 +1,12 @@
-import Navbar from "@/app/components/Navbar";
+import Navbar from "@/app/components/Navbar/Navbar";
 import { Toaster } from "@/components/ui/sonner";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      {children} <Toaster position="top-center" />
+      {children}
+      <Toaster position="top-center" />
     </div>
   );
 }
