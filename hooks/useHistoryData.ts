@@ -43,18 +43,16 @@ async function fetchMonth(userId: string, month: Date, habitId?: string): Promis
 
 export function useHistoryData(user: User | null) {
   const [historyGrouped, setHistoryGrouped] = useState<GroupedCompletions | null>(null);
-  const userRef = useRef(user);
-  userRef.current = user;
   const historySeqRef = useRef(0);
 
   const fetchHistory = useCallback((month: Date, habitId?: string) => {
-    if (!userRef.current) return;
+    if (!user) return;
     const seq = ++historySeqRef.current;
     setHistoryGrouped(null);
-    fetchMonth(userRef.current.id, month, habitId)
+    fetchMonth(user.id, month, habitId)
       .then((data) => { if (historySeqRef.current === seq) setHistoryGrouped(data); })
       .catch(() => { if (historySeqRef.current === seq) setHistoryGrouped({}); });
-  }, []);
+  }, [user]);
 
   return { historyGrouped, fetchHistory };
 }
