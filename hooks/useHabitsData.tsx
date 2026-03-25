@@ -27,14 +27,19 @@ export function useHabitsData(
 
   const fetchHabits = async (): Promise<Habit[] | null> => {
     if (!user) return null;
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("habits")
       .select("*")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
+    if (error) {
+      console.error("[Habits] fetchHabits error:", error);
+      setHabits([]);
+      return [];
+    }
     if (data) setHabits(data);
-    return data ?? null;
+    return data ?? [];
   };
 
   const createHabit = async (
