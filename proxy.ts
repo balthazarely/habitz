@@ -1,4 +1,3 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 
 const protectedRoutes = ["/home", "/my-habits", "/settings", "/history"];
@@ -6,33 +5,23 @@ const publicRoutes = ["/"];
 
 export async function proxy(request: NextRequest) {
   const response = NextResponse.next();
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => request.cookies.getAll(),
-        setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
-          );
-        },
-      },
-    },
-  );
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   const { pathname } = request.nextUrl;
 
-  if (protectedRoutes.some((r) => pathname.startsWith(r)) && !user) {
+  // Only check whether a session cookie exists — never refresh tokens here.
+  // Server-side token refresh (getUser) causes the middleware to update the
+  // cookie while the browser client is also initialising, producing two
+  // concurrent _recoverAndRefresh calls that steal each other's Web Lock and
+  // break all subsequent Supabase queries. All token refresh is left entirely
+  // to createBrowserClient on the client side.
+  const hasSession = request.cookies
+    .getAll()
+    .some((c) => c.name.startsWith("sb-") && c.name.endsWith("-auth-token") && c.value);
+
+  if (protectedRoutes.some((r) => pathname.startsWith(r)) && !hasSession) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (publicRoutes.includes(pathname) && user) {
+  if (publicRoutes.includes(pathname) && hasSession) {
     return NextResponse.redirect(new URL("/home", request.url));
   }
 
