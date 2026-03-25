@@ -14,7 +14,7 @@ export interface GroupedCompletions {
   [date: string]: Completion[];
 }
 
-async function fetchMonth(userId: string, month: Date, habitId?: string): Promise<GroupedCompletions> {
+async function fetchMonth(userId: string, month: Date, signal: AbortSignal, habitId?: string): Promise<GroupedCompletions> {
   const year = month.getFullYear();
   const m = month.getMonth() + 1;
   const first = `${year}-${String(m).padStart(2, "0")}-01`;
@@ -27,7 +27,8 @@ async function fetchMonth(userId: string, month: Date, habitId?: string): Promis
     .eq("user_id", userId)
     .gte("completed_on", first)
     .lte("completed_on", last)
-    .order("completed_on", { ascending: false });
+    .order("completed_on", { ascending: false })
+    .abortSignal(signal);
 
   if (habitId) query = query.eq("habit_id", habitId);
 
@@ -44,14 +45,23 @@ async function fetchMonth(userId: string, month: Date, habitId?: string): Promis
 export function useHistoryData(user: User | null) {
   const [historyGrouped, setHistoryGrouped] = useState<GroupedCompletions | null>(null);
   const historySeqRef = useRef(0);
+  const abortRef = useRef<AbortController | null>(null);
 
   const fetchHistory = useCallback((month: Date, habitId?: string) => {
     if (!user) return;
+
+    abortRef.current?.abort();
+    abortRef.current = new AbortController();
+
     const seq = ++historySeqRef.current;
+    const { signal } = abortRef.current;
     setHistoryGrouped(null);
-    fetchMonth(user.id, month, habitId)
+    fetchMonth(user.id, month, signal, habitId)
       .then((data) => { if (historySeqRef.current === seq) setHistoryGrouped(data); })
-      .catch(() => { if (historySeqRef.current === seq) setHistoryGrouped({}); });
+      .catch((err) => {
+        if (err?.name === "AbortError") return;
+        if (historySeqRef.current === seq) setHistoryGrouped({});
+      });
   }, [user]);
 
   return { historyGrouped, fetchHistory };
