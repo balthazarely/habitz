@@ -1,4 +1,8 @@
+import { NextRequest, NextResponse } from "next/server";
+
 // Route protection is handled client-side in app/(app)/layout.tsx.
-// This file is intentionally left with an empty matcher so Next.js never
-// invokes it — keeping it here avoids a build warning about the missing file.
+export function proxy(_request: NextRequest) {
+  return NextResponse.next();
+}
+
 export const config = { matcher: [] };
