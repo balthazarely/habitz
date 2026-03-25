@@ -54,9 +54,16 @@ export default function HabitProvider({ children }: { children: ReactNode }) {
   const historyData = useHistoryData(user);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      console.log("[Habits] effect skipped — no user");
+      return;
+    }
+    console.log("[Habits] effect fired — fetching habits for user:", user.id);
     habitsData.fetchHabits().then((fetched) => {
+      console.log("[Habits] fetchHabits resolved, count:", fetched?.length ?? "null");
       todayData.syncAndFetchToday(fetched ?? []);
+    }).catch((err) => {
+      console.error("[Habits] fetchHabits threw:", err);
     });
   }, [user?.id]);
 

@@ -45,12 +45,15 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      console.log("[Auth] onAuthStateChange event:", _event, "session:", session?.user?.id ?? null);
       if (session?.user) {
         const profile = await fetchProfile(session.user.id);
         if (profile) {
+          console.log("[Auth] profile loaded:", profile.id);
           setUser(profile);
           if (profile.theme) setTheme(profile.theme);
         } else {
+          console.warn("[Auth] fetchProfile returned null, using session fallback");
           // DB unreachable but auth session is valid — use session data so the
           // loading chain isn't permanently stuck.
           setUser({
@@ -62,6 +65,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           });
         }
       } else {
+        console.log("[Auth] no session, setting user null");
         setUser(null);
       }
       setIsLoading(false);
@@ -70,13 +74,18 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const fetchProfile = async (id: string): Promise<User | null> => {
+    console.log("[Auth] fetchProfile start:", id);
     const { data, error } = await supabase
       .from("users")
       .select("*")
       .eq("id", id)
       .single();
 
-    if (error || !data) return null;
+    if (error || !data) {
+      console.error("[Auth] fetchProfile error:", error);
+      return null;
+    }
+    console.log("[Auth] fetchProfile success:", data.id);
     return data as User;
   };
 

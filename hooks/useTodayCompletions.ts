@@ -11,8 +11,12 @@ export function useTodayCompletions(user: User | null) {
   // Ensures a completion row exists for every habit scheduled today,
   // then rebuilds completedIds from the current rows.
   const syncAndFetchToday = useCallback(async (currentHabits: Habit[]) => {
-    if (!user) return;
+    if (!user) {
+      console.log("[Today] syncAndFetchToday skipped — no user");
+      return;
+    }
     const userId = user.id;
+    console.log("[Today] syncAndFetchToday start, habits:", currentHabits.length);
 
     try {
       const scheduled = currentHabits.filter((h) => h.frequency.includes(todayShort));
@@ -39,7 +43,10 @@ export function useTodayCompletions(user: User | null) {
       if (data) {
         setCompletedIds(new Set(data.filter((c) => c.completed).map((c) => c.habit_id)));
       }
+    } catch (err) {
+      console.error("[Today] syncAndFetchToday error:", err);
     } finally {
+      console.log("[Today] completionsReady = true");
       setCompletionsReady(true);
     }
   }, [user]);
