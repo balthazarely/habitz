@@ -1,15 +1,10 @@
 import "@testing-library/jest-dom";
-import {
-  act,
-  fireEvent,
-  render,
-  renderHook,
-  screen,
-} from "@testing-library/react";
-import { Habit, useHabit } from "@/context/HabitsContext";
+import { act, renderHook } from "@testing-library/react";
+import { Habit } from "@/context/HabitsContext";
 import { User } from "@/context/AuthContext";
 import { useHabitsData } from "./useHabitsData";
 import { supabase } from "@/lib/supabaseClient";
+import { toast } from "sonner";
 
 jest.mock("@/lib/supabaseClient", () => ({
   supabase: { from: jest.fn() },
@@ -31,6 +26,17 @@ const fakeHabit: Habit = {
   emoji: "😎",
   created_at: "123123124124",
 };
+
+const fakeHabit2: Habit = {
+  id: "2",
+  user_id: "2",
+  name: "Go hiking",
+  description: "Enjoy the outdoors",
+  frequency: ["Fri"],
+  emoji: "😎",
+  created_at: "123123124124",
+};
+
 const fakeUser: User = {
   id: "2",
   first_name: "benathin",
@@ -70,6 +76,42 @@ describe("useHabitsData ", () => {
     expect(result.current.habits).toEqual([fakeHabit]);
   });
 
+  it("Should return today's habits when todaysHabits is called", async () => {
+    mockFrom.mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      order: jest.fn().mockResolvedValue({ data: [fakeHabit], error: null }),
+    });
+
+    const { result } = renderHook(() =>
+      useHabitsData(fakeUser, mockSyncToday, mockOnHabitDeleted),
+    );
+
+    await act(async () => {
+      await result.current.fetchHabits();
+    });
+
+    expect(result.current.todaysHabits).toEqual([fakeHabit]);
+  });
+
+  it("Should not return today's habits when todaysHabits is called if day isnt monday", async () => {
+    mockFrom.mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      order: jest.fn().mockResolvedValue({ data: [fakeHabit2], error: null }),
+    });
+
+    const { result } = renderHook(() =>
+      useHabitsData(fakeUser, mockSyncToday, mockOnHabitDeleted),
+    );
+
+    await act(async () => {
+      await result.current.fetchHabits();
+    });
+
+    expect(result.current.todaysHabits).toEqual([]);
+  });
+
   it("Should created a habit when createHabit is called", async () => {
     const createdHabit = {
       name: "Go hiking",
@@ -99,6 +141,7 @@ describe("useHabitsData ", () => {
     });
 
     expect(result.current.habits).toEqual([createdHabit]);
+    expect(toast).toHaveBeenCalledWith("Habit created!", expect.any(Object));
   });
 
   it("Should update a habit when updateHabit is called", async () => {
@@ -152,6 +195,7 @@ describe("useHabitsData ", () => {
     });
 
     expect(result.current.habits).toEqual([updatedHabit]);
+    expect(toast).toHaveBeenCalledWith("Habit updated!", expect.any(Object));
   });
 
   it("Should delete a habit when deleteHabit is called", async () => {
@@ -179,5 +223,6 @@ describe("useHabitsData ", () => {
     });
 
     expect(result.current.habits).toEqual([]);
+    expect(toast).toHaveBeenCalledWith("Habit deleted!", expect.any(Object));
   });
 });
