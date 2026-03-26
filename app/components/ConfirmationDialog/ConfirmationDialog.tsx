@@ -33,16 +33,24 @@ export default function ConfirmationDialog({
         if (!open) cancelAction();
       }}
     >
-      <DialogContent>
+      <DialogContent aria-label="dialog content">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         {text}
         <div className="flex gap-3 justify-end">
-          <Button variant="ghost" onClick={() => cancelAction()}>
+          <Button
+            aria-label="cancel btn"
+            variant="ghost"
+            onClick={() => cancelAction()}
+          >
             {cancelText}
           </Button>
-          <Button variant="destructive" onClick={async () => proceedAction()}>
+          <Button
+            aria-label="proceed btn"
+            variant="destructive"
+            onClick={async () => proceedAction()}
+          >
             {proceedText}
           </Button>
         </div>

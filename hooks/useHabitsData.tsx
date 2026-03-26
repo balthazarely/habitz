@@ -23,7 +23,9 @@ export function useHabitsData(
   const [habits, setHabits] = useState<Habit[] | null>(null);
 
   const todaysHabits =
-    habits === null ? null : habits.filter((h) => h.frequency.includes(todayShort));
+    habits === null
+      ? null
+      : habits.filter((h) => h.frequency.includes(todayShort));
 
   const fetchHabits = async (): Promise<Habit[] | null> => {
     if (!user) return null;
@@ -51,7 +53,13 @@ export function useHabitsData(
     if (!user) return null;
     const { data, error } = await supabase
       .from("habits")
-      .insert({ name, description, frequency, emoji: emoji ?? null, user_id: user.id })
+      .insert({
+        name,
+        description,
+        frequency,
+        emoji: emoji ?? null,
+        user_id: user.id,
+      })
       .select()
       .single();
 
@@ -59,7 +67,9 @@ export function useHabitsData(
     if (data) {
       const next = [data, ...(habits ?? [])];
       setHabits(next);
-      toast("Habit created!", { icon: <FaCheckCircle className="w-4 h-4 text-green-500" /> });
+      toast("Habit created!", {
+        icon: <FaCheckCircle className="w-4 h-4 text-green-500" />,
+      });
       if (frequency.includes(todayShort)) await syncToday(next);
     }
     return data;
@@ -83,7 +93,9 @@ export function useHabitsData(
     if (data) {
       const next = (habits ?? []).map((h) => (h.id === id ? data : h));
       setHabits(next);
-      toast("Habit updated!", { icon: <FaCheckCircle className="w-4 h-4 text-green-500" /> });
+      toast("Habit updated!", {
+        icon: <FaCheckCircle className="w-4 h-4 text-green-500" />,
+      });
       await syncToday(next);
     }
   };
@@ -102,8 +114,17 @@ export function useHabitsData(
 
     setHabits((prev) => (prev ?? []).filter((h) => h.id !== id));
     onHabitDeleted(id);
-    toast("Habit deleted!", { icon: <FaCheckCircle className="w-4 h-4 text-red-500" /> });
+    toast("Habit deleted!", {
+      icon: <FaCheckCircle className="w-4 h-4 text-red-500" />,
+    });
   };
 
-  return { habits, todaysHabits, fetchHabits, createHabit, updateHabit, deleteHabit };
+  return {
+    habits,
+    todaysHabits,
+    fetchHabits,
+    createHabit,
+    updateHabit,
+    deleteHabit,
+  };
 }

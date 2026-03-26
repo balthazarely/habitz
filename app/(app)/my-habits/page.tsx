@@ -24,15 +24,13 @@ export default function MyHabitsPage() {
 
       <div className="flex flex-col gap-3">
         {habits === null ? (
-          <>
+          <div aria-label="skeleton">
             {Array.from({ length: 6 }).map((_, i) => (
               <HabitCardDetailedSkeleton key={i} />
             ))}
-          </>
+          </div>
         ) : habits.length === 0 ? (
-          <p className="text-sm text-zinc-400">
-            No habits yet. Create one above.
-          </p>
+          <p className="text-sm text-zinc-400">No habits yet</p>
         ) : (
           habits.map((habit: Habit) => (
             <HabitCardDetailed
@@ -64,7 +62,7 @@ export default function MyHabitsPage() {
           </p>
         }
         cancelText="Cancel"
-        proceedText="  Delete"
+        proceedText="Delete"
         cancelAction={() => setDeletingHabit(null)}
         proceedAction={() => handleDeleteHabit()}
       />
