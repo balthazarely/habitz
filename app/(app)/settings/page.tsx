@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/context/AuthContext";
 import { FaCheck } from "react-icons/fa6";
 import { FaSignOutAlt } from "react-icons/fa";
+import ConfirmationDialog from "@/app/components/ConfirmationDialog/ConfirmationDialog";
 
 import { toast } from "sonner";
 
@@ -19,6 +20,7 @@ export default function SettingsPage() {
   const [lastName, setLastName] = useState("");
   const [theme, setTheme] = useState("light");
   const [saving, setSaving] = useState(false);
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
 
   const nameChanged =
     firstName !== (user?.first_name ?? "") ||
@@ -126,7 +128,7 @@ export default function SettingsPage() {
         <div className="bg-card border border-border rounded-2xl">
           <Button
             variant="ghost"
-            onClick={() => signOut()}
+            onClick={() => setShowSignOutConfirm(true)}
             className="w-full justify-start px-4 py-4 h-auto text-red-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-2xl"
           >
             <FaSignOutAlt className="w-4 h-4" />
@@ -134,6 +136,15 @@ export default function SettingsPage() {
           </Button>
         </div>
       </section>
+      <ConfirmationDialog
+        isOpen={showSignOutConfirm}
+        title="Sign out"
+        text={<p className="text-sm text-muted-foreground">Are you sure you want to sign out?</p>}
+        cancelText="Cancel"
+        proceedText="Sign out"
+        cancelAction={() => setShowSignOutConfirm(false)}
+        proceedAction={signOut}
+      />
     </main>
   );
 }

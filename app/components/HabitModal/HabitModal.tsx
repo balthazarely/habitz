@@ -2,6 +2,7 @@
 
 import { useHabit, type Habit } from "@/context/HabitsContext";
 import { useState } from "react";
+import { suggestEmoji } from "@/lib/emojiSuggestions";
 import dynamic from "next/dynamic";
 import type { EmojiClickData } from "emoji-picker-react";
 import {
@@ -34,6 +35,7 @@ export default function HabitModal({ habit, onClose }: Props) {
     habit?.frequency ?? [],
   );
   const [emoji, setEmoji] = useState<string | null>(habit?.emoji ?? null);
+  const [emojiManuallySet, setEmojiManuallySet] = useState(!!habit?.emoji);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,8 +53,17 @@ export default function HabitModal({ habit, onClose }: Props) {
     if (!next) onClose?.();
   };
 
+  const handleNameChange = (value: string) => {
+    setName(value);
+    if (!emojiManuallySet) {
+      const suggestion = suggestEmoji(value);
+      if (suggestion) setEmoji(suggestion);
+    }
+  };
+
   const handleEmojiClick = (data: EmojiClickData) => {
     setEmoji(data.emoji);
+    setEmojiManuallySet(true);
     setPickerOpen(false);
   };
 
@@ -93,7 +104,7 @@ export default function HabitModal({ habit, onClose }: Props) {
           </DialogTrigger>
           <button
             onClick={() => setOpen(true)}
-            className="md:hidden fixed bottom-24 right-4 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center"
+            className="md:hidden fixed bottom-24 right-4 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center cursor-pointer hover:opacity-90 hover:scale-105 transition-transform duration-150"
           >
             <svg
               className="w-7 h-7"
@@ -148,7 +159,7 @@ export default function HabitModal({ habit, onClose }: Props) {
                 required
                 placeholder="e.g. Morning run"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => handleNameChange(e.target.value)}
               />
             </div>
           </div>

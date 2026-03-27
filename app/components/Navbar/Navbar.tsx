@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 const navItems = [
   {
@@ -50,8 +51,8 @@ export default function Navbar() {
     <>
       {/* Desktop top nav */}
       <header className="hidden md:flex w-full border-b border-border bg-background px-6 py-4 items-center justify-between sticky top-0 z-50">
-        <Link href="/home" className="text-xl font-bold text-foreground">
-          Habitz
+        <Link href="/home">
+          <Image src="/habitz_horizontal.png" alt="Habitz" width={100} height={32} />
         </Link>
         <div className="flex items-center gap-4">
           {navItems.map((item) => (

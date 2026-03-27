@@ -40,6 +40,7 @@ export default function HistoryCalendar({ month, onMonthChange, grouped }: Props
       mode="single"
       month={month}
       onMonthChange={onMonthChange}
+      hideNavigation
       className="rounded-lg border w-full"
       components={{
         DayButton: ({ day, modifiers, children, ...props }: React.ComponentProps<typeof DayButton>) => {

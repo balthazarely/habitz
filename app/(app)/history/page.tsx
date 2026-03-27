@@ -25,7 +25,8 @@ export default function HistoryPage() {
   const [selectedHabitId, setSelectedHabitId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchHistory(monthDate, selectedHabitId ?? undefined);
+    if (!user?.id) return;
+    fetchHistory(user.id, monthDate, selectedHabitId ?? undefined);
   }, [user?.id, monthDate, selectedHabitId]);
 
   const monthLabel = monthDate.toLocaleDateString("en-US", {
@@ -41,6 +42,27 @@ export default function HistoryPage() {
         selectedHabitId={selectedHabitId}
         setSelectedHabitId={setSelectedHabitId}
       />
+      <div className="flex items-center justify-center gap-4">
+        <button
+          onClick={() => setMonthDate(new Date(monthDate.getFullYear(), monthDate.getMonth() - 1, 1))}
+          className="p-2 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+          aria-label="Previous month"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <span className="text-sm font-medium w-32 text-center">{monthLabel}</span>
+        <button
+          onClick={() => setMonthDate(new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1))}
+          className="p-2 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+          aria-label="Next month"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
       <HistoryMonthStatsCard grouped={historyGrouped} monthLabel={monthLabel} />
       <Accordion>
         <AccordionItem value="calendar" className="border-none">

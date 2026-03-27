@@ -42,35 +42,39 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const { setTheme } = useTheme();
 
   useEffect(() => {
+    let didSetInitial = false;
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log("[Auth] onAuthStateChange event:", _event, "session:", session?.user?.id ?? null);
       if (session?.user) {
         const profile = await fetchProfile(session.user.id);
-        if (profile) {
-          console.log("[Auth] profile loaded:", profile.id);
-          setUser(profile);
-          if (profile.theme) setTheme(profile.theme);
-        } else {
-          console.warn("[Auth] fetchProfile returned null, using session fallback");
-          // DB unreachable but auth session is valid — use session data so the
-          // loading chain isn't permanently stuck.
-          setUser({
+        setUser(
+          profile ?? {
             id: session.user.id,
             email: session.user.email ?? "",
             first_name: "",
             last_name: "",
             theme: "light",
-          });
-        }
+          }
+        );
+        if (profile?.theme) setTheme(profile.theme);
       } else {
-        console.log("[Auth] no session, setting user null");
         setUser(null);
       }
       setIsLoading(false);
+      didSetInitial = true;
     });
-    return () => subscription.unsubscribe();
+
+    // Safety net: if onAuthStateChange never fires, don't block forever
+    const timeout = setTimeout(() => {
+      if (!didSetInitial) setIsLoading(false);
+    }, 8000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const fetchProfile = async (id: string): Promise<User | null> => {
@@ -110,16 +114,12 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     if (error) throw error;
-
-    if (data.user) {
-      const profile = await fetchProfile(data.user.id);
-      if (profile) setUser(profile);
-    }
+    // onAuthStateChange handles setting the user
   };
 
   const signOut = async () => {

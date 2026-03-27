@@ -20,7 +20,7 @@ interface HabitContextType {
   completedIds: Set<string>;
   completionsReady: boolean;
   historyGrouped: GroupedCompletions | null;
-  fetchHistory: (month: Date, habitId?: string) => void;
+  fetchHistory: (userId: string, month: Date, habitId?: string) => void;
   createHabit: (
     name: string,
     description: string,
@@ -34,8 +34,10 @@ interface HabitContextType {
     frequency: string[],
     emoji?: string,
   ) => Promise<void>;
+  setHabits: (habits: Habit[] | null) => void;
   deleteHabit: (id: string) => Promise<void>;
   toggleCompletion: (habitId: string) => Promise<void>;
+  updateHabitOrder: (orderedIds: string[]) => Promise<void>;
 }
 
 const HabitContext = createContext<HabitContextType | undefined>(undefined);
@@ -51,11 +53,13 @@ export default function HabitProvider({ children }: { children: ReactNode }) {
     todayData.syncAndFetchToday,
     todayData.handleHabitDeleted,
   );
-  const historyData = useHistoryData(user);
+  const historyData = useHistoryData();
 
   useEffect(() => {
     if (!user) {
       console.log("[Habits] effect skipped — no user");
+      habitsData.setHabits(null);
+      historyData.setHistoryGrouped(null);
       return;
     }
     console.log("[Habits] effect fired — fetching habits for user:", user.id);
@@ -76,10 +80,12 @@ export default function HabitProvider({ children }: { children: ReactNode }) {
         completionsReady: todayData.completionsReady,
         historyGrouped: historyData.historyGrouped,
         fetchHistory: historyData.fetchHistory,
+        setHabits: habitsData.setHabits,
         createHabit: habitsData.createHabit,
         updateHabit: habitsData.updateHabit,
         deleteHabit: habitsData.deleteHabit,
         toggleCompletion: todayData.toggleCompletion,
+        updateHabitOrder: habitsData.updateHabitOrder,
       }}
     >
       {children}

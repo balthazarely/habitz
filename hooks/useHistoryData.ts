@@ -1,6 +1,5 @@
 import { useCallback, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import type { User } from "@/context/AuthContext";
 
 export interface Completion {
   id: string;
@@ -42,27 +41,26 @@ async function fetchMonth(userId: string, month: Date, signal: AbortSignal, habi
   }, {});
 }
 
-export function useHistoryData(user: User | null) {
+export function useHistoryData() {
   const [historyGrouped, setHistoryGrouped] = useState<GroupedCompletions | null>(null);
   const historySeqRef = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
 
-  const fetchHistory = useCallback((month: Date, habitId?: string) => {
-    if (!user) return;
-
+  // userId is passed directly — no closure or ref needed, always correct.
+  const fetchHistory = useCallback((userId: string, month: Date, habitId?: string) => {
     abortRef.current?.abort();
     abortRef.current = new AbortController();
 
     const seq = ++historySeqRef.current;
     const { signal } = abortRef.current;
     setHistoryGrouped(null);
-    fetchMonth(user.id, month, signal, habitId)
+    fetchMonth(userId, month, signal, habitId)
       .then((data) => { if (historySeqRef.current === seq) setHistoryGrouped(data); })
       .catch((err) => {
         if (err?.name === "AbortError") return;
         if (historySeqRef.current === seq) setHistoryGrouped({});
       });
-  }, [user]);
+  }, []);
 
-  return { historyGrouped, fetchHistory };
+  return { historyGrouped, setHistoryGrouped, fetchHistory };
 }

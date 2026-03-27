@@ -13,7 +13,8 @@ interface Props {
 export default function HabitCard({ habit, done, onToggle }: Props) {
   return (
     <div
-      className={`rounded-xl p-4 flex items-center justify-between transition-colors border ${
+      onClick={onToggle}
+      className={`rounded-xl p-4 flex items-center justify-between transition-colors border cursor-pointer ${
         done ? "bg-muted border-border" : "bg-card border-border"
       }`}
     >
@@ -36,9 +37,8 @@ export default function HabitCard({ habit, done, onToggle }: Props) {
       <Button
         variant={done ? "default" : "outline"}
         size="icon"
-        onClick={onToggle}
         aria-label="toggle-habit-btn"
-        className="rounded-full shrink-0"
+        className="rounded-full shrink-0 pointer-events-none"
       >
         {done && <FaCheck aria-label="completed" />}
       </Button>

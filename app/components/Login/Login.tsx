@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -40,13 +41,16 @@ export default function Login() {
 
   return (
     <div className="w-full max-w-sm bg-card border border-border rounded-2xl shadow-md p-8 flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-foreground">
-          {isSignUp ? "Create account" : "Welcome back"}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {isSignUp ? "Sign up to get started with Habitz" : "Sign in to your account"}
-        </p>
+      <div className="flex flex-col items-center gap-3">
+        <Image src="/logo.png" alt="Habitz logo" width={120} height={120} />
+        <div className="flex flex-col gap-1 items-center">
+          <h1 className="text-2xl font-bold text-foreground">
+            {isSignUp ? "Create account" : "Welcome back"}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {isSignUp ? "Sign up to get started with Habitz" : "Sign in to your account"}
+          </p>
+        </div>
       </div>
 
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>

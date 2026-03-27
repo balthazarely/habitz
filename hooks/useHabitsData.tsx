@@ -33,7 +33,7 @@ export function useHabitsData(
       .from("habits")
       .select("*")
       .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+      .order("sort_order", { ascending: true });
 
     if (error) {
       console.error("[Habits] fetchHabits error:", error);
@@ -51,6 +51,7 @@ export function useHabitsData(
     emoji?: string,
   ) => {
     if (!user) return null;
+    const nextOrder = (habits ?? []).length;
     const { data, error } = await supabase
       .from("habits")
       .insert({
@@ -59,13 +60,14 @@ export function useHabitsData(
         frequency,
         emoji: emoji ?? null,
         user_id: user.id,
+        sort_order: nextOrder,
       })
       .select()
       .single();
 
     if (error) throw error;
     if (data) {
-      const next = [data, ...(habits ?? [])];
+      const next = [...(habits ?? []), data];
       setHabits(next);
       toast("Habit created!", {
         icon: <FaCheckCircle className="w-4 h-4 text-green-500" />,
@@ -119,12 +121,21 @@ export function useHabitsData(
     });
   };
 
+  const updateHabitOrder = async (orderedIds: string[]) => {
+    const updates = orderedIds.map((id, index) =>
+      supabase.from("habits").update({ sort_order: index }).eq("id", id)
+    );
+    await Promise.all(updates);
+  };
+
   return {
     habits,
     todaysHabits,
+    setHabits,
     fetchHabits,
     createHabit,
     updateHabit,
     deleteHabit,
+    updateHabitOrder,
   };
 }
